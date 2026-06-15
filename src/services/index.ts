@@ -1,0 +1,1 @@
+export { IPTVApi } from './IPTVApi';
