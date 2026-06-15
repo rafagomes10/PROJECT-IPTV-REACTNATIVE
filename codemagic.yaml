@@ -1,0 +1,35 @@
+workflows:
+  android-release:
+    name: Android Release
+
+    environment:
+      node: 22
+
+    scripts:
+      - npm install
+      - cd android
+      - chmod +x gradlew
+      - ./gradlew assembleRelease
+
+    artifacts:
+      - android/app/build/outputs/**/*.apk
+
+  ios-release:
+    name: iOS Release
+
+    environment:
+      node: 22
+
+    scripts:
+      - npm install
+      - cd ios
+      - pod install
+      - xcodebuild -workspace *.xcworkspace \
+          -scheme $(ls | grep xcodeproj | sed 's/.xcodeproj//') \
+          -sdk iphoneos \
+          -configuration Release \
+          archive \
+          -archivePath build/App.xcarchive
+
+    artifacts:
+      - ios/build/**/*.ipa
