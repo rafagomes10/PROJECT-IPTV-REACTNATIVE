@@ -7,9 +7,11 @@ workflows:
 
     scripts:
       - npm install
-      - cd android
-      - chmod +x gradlew
-      - ./gradlew assembleRelease
+
+      - |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease
 
     artifacts:
       - android/app/build/outputs/**/*.apk
@@ -22,14 +24,22 @@ workflows:
 
     scripts:
       - npm install
-      - cd ios
-      - pod install
-      - xcodebuild -workspace *.xcworkspace \
-          -scheme $(ls | grep xcodeproj | sed 's/.xcodeproj//') \
-          -sdk iphoneos \
-          -configuration Release \
-          archive \
-          -archivePath build/App.xcarchive
+
+      - |
+          cd ios
+          pod install
+
+      - |
+          cd ios
+
+          PROJECT_NAME=$(find . -maxdepth 1 -name "*.xcodeproj" | head -n 1 | sed 's|./||' | sed 's|.xcodeproj||')
+
+          xcodebuild \
+            -project "${PROJECT_NAME}.xcodeproj" \
+            -scheme "${PROJECT_NAME}" \
+            -sdk iphoneos \
+            -configuration Release \
+            build
 
     artifacts:
-      - ios/build/**/*.ipa
+      - ios/**/*.ipa
